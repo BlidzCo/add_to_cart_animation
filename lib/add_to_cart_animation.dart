@@ -1,15 +1,15 @@
 import 'dart:math';
 
-import 'drag_to_cart_animation_options.dart';
-
-import 'jump_animation_options.dart';
-import 'add_to_cart_icon.dart';
-import 'globalkeyext.dart';
 import 'package:flutter/material.dart';
 
+import 'add_to_cart_icon.dart';
+import 'drag_to_cart_animation_options.dart';
+import 'globalkeyext.dart';
+import 'jump_animation_options.dart';
+
 export 'add_to_cart_icon.dart';
-export 'jump_animation_options.dart';
 export 'drag_to_cart_animation_options.dart';
+export 'jump_animation_options.dart';
 
 class _PositionedAnimationModel {
   bool showAnimation = false;
@@ -87,18 +87,10 @@ class _AddToCartAnimationState extends State<AddToCartAnimation> {
             children: animationModels
                 .map<Widget>((model) => model.showAnimation
                     ? AnimatedPositioned(
-                        top: model.animationActive
-                            ? model.imageDestPoint.dx
-                            : model.imageSourcePoint.dx,
-                        left: model.animationActive
-                            ? model.imageDestPoint.dy
-                            : model.imageSourcePoint.dy,
-                        height: model.animationActive
-                            ? model.imageDestSize.height
-                            : model.imageSourceSize.height,
-                        width: model.animationActive
-                            ? model.imageDestSize.width
-                            : model.imageSourceSize.width,
+                        top: model.animationActive ? model.imageDestPoint.dx : model.imageSourcePoint.dx,
+                        left: model.animationActive ? model.imageDestPoint.dy : model.imageSourcePoint.dy,
+                        height: model.animationActive ? model.imageDestSize.height : model.imageSourceSize.height,
+                        width: model.animationActive ? model.imageDestSize.width : model.imageSourceSize.width,
                         duration: model.duration,
                         curve: model.curve,
                         child: model.rotation
@@ -134,23 +126,18 @@ class _AddToCartAnimationState extends State<AddToCartAnimation> {
       ..rotation = false
       ..opacity = widget.opacity;
 
-    animationModel.imageSourcePoint = Offset(
-        widgetKey.globalPaintBounds!.top, widgetKey.globalPaintBounds!.left);
+    animationModel.imageSourcePoint = Offset(widgetKey.globalPaintBounds!.top, widgetKey.globalPaintBounds!.left);
 
     // Improvement/Suggestion 1: Provinding option, in order to, use/or not initial "jumping" on image
-    var startingHeight = widget.jumpAnimation.active
-        ? widgetKey.currentContext!.size!.height
-        : 0;
-    animationModel.imageDestPoint = Offset(
-        widgetKey.globalPaintBounds!.top - (startingHeight + widget.height),
-        widgetKey.globalPaintBounds!.left);
+    var startingHeight = widget.jumpAnimation.active ? widgetKey.currentContext!.size!.height : 0;
+    animationModel.imageDestPoint =
+        Offset(widgetKey.globalPaintBounds!.top - (startingHeight + widget.height), widgetKey.globalPaintBounds!.left);
 
-    animationModel.imageSourceSize = Size(widgetKey.currentContext!.size!.width,
-        widgetKey.currentContext!.size!.height);
+    animationModel.imageSourceSize =
+        Size(widgetKey.currentContext!.size!.width, widgetKey.currentContext!.size!.height);
 
     animationModel.imageDestSize = Size(
-        widgetKey.currentContext!.size!.width + widget.width,
-        widgetKey.currentContext!.size!.height + widget.height);
+        widgetKey.currentContext!.size!.width + widget.width, widgetKey.currentContext!.size!.height + widget.height);
 
     animationModels.add(animationModel);
     // Improvement/Suggestion 2: Changing the animationModel.child from Image to gkImageContainer
@@ -160,38 +147,38 @@ class _AddToCartAnimationState extends State<AddToCartAnimation> {
 
     animationModel.showAnimation = true;
 
-    setState(() {});
+    if (mounted) setState(() {});
 
     await Future.delayed(Duration(milliseconds: 75));
 
-    animationModel.curve = widget.jumpAnimation.curve;
-    animationModel.duration =
-        widget.jumpAnimation.duration; // This is for preview mode
+    if (widget.jumpAnimation.active) {
+      animationModel.curve = widget.jumpAnimation.curve;
+      animationModel.duration = widget.jumpAnimation.duration;
+    }
+
+    // This is for preview mode
     animationModel.animationActive = true; // That's start the animation.
-    setState(() {});
+    if (mounted) setState(() {});
 
     await Future.delayed(animationModel.duration);
     // Drag to cart animation
     animationModel.curve = widget.dragAnimation.curve;
     animationModel.rotation = widget.dragAnimation.rotation;
-    animationModel.duration =
-        widget.dragAnimation.duration; // this is for add to button mode
+    animationModel.duration = widget.dragAnimation.duration; // this is for add to button mode
 
-    animationModel.imageDestPoint = Offset(
-        this.widget.cartKey.globalPaintBounds!.top,
-        this.widget.cartKey.globalPaintBounds!.left);
+    animationModel.imageDestPoint =
+        Offset(this.widget.cartKey.globalPaintBounds!.top, this.widget.cartKey.globalPaintBounds!.left);
 
-    animationModel.imageDestSize = Size(
-        this.widget.cartKey.currentContext!.size!.width,
-        this.widget.cartKey.currentContext!.size!.height);
+    animationModel.imageDestSize =
+        Size(this.widget.cartKey.currentContext!.size!.width, this.widget.cartKey.currentContext!.size!.height);
 
-    setState(() {});
+    if (mounted) setState(() {});
 
     await Future.delayed(animationModel.duration);
     animationModel.showAnimation = false;
     animationModel.animationActive = false;
 
-    setState(() {});
+    if (mounted) setState(() {});
 
     // Improvement/Suggestion 4.3: runCartAnimation is running independently, using gkCart.currentState(main.dart)
     // await this.widget.gkCart.currentState!.runCartAnimation();
